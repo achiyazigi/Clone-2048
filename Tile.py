@@ -2,10 +2,11 @@ import pygame
 
 pygame.font.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
-INITIAL_COLOR = 56
 
 
 class Tile:
+    INITIAL_COLOR = 56
+    COLOR_FACTOR = 1
     def __init__(self, x, y, size, margin, num):
         self.x = x
         self.y = y
@@ -26,4 +27,5 @@ class Tile:
         return Tile.get_color_from_num(self.num)
 
     def get_color_from_num(num):
-        return pygame.Color((77*num) % 200 + INITIAL_COLOR, (125*num) % 200 + INITIAL_COLOR, (113*num) % 200 + INITIAL_COLOR)
+        num = num * Tile.COLOR_FACTOR
+        return pygame.Color((77*num) % 200 + Tile.INITIAL_COLOR, (125*num) % 200 + Tile.INITIAL_COLOR, (113*num) % 200 + Tile.INITIAL_COLOR)

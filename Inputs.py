@@ -13,6 +13,7 @@ class Input:
         self.any_key_pressed = False
         self.quit = False
 
+
     def check_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -32,14 +33,8 @@ class Input:
                     self.space = True
                 elif event.key == K_ESCAPE:
                     self.back = True
+
                 break
 
     def reset(self):
-        self.up = False
-        self.down = False
-        self.left = False
-        self.right = False
-        self.space = False
-        self.back = False
-        self.any_key_pressed = False
-        self.quit = False
+        self.__init__()

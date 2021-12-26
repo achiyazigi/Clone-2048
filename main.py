@@ -4,7 +4,9 @@ import pygame
 from Tiles import Tiles
 from pygame import Rect
 from pygame.locals import *
-from MyMenu import *
+from pygameMenuPro import *
+from MyMenu import create_my_menu
+
 from Inputs import Input
 
 
@@ -22,59 +24,64 @@ screen = pygame.display.set_mode(WINDOW_SIZE, depth=32)
 TILES_RECT_SIZE = 300
 TILES_RECT_POS = ((WIDTH-TILES_RECT_SIZE)//2, (HEIGHT - TILES_RECT_SIZE)//2)
 
+TITLE_POS = (WIDTH//2, HEIGHT//2 - 100)
+
+BACKGROUND_COLOR = Color(23,170,84)
 
 tiles_rect = Rect(*TILES_RECT_POS, TILES_RECT_SIZE, TILES_RECT_SIZE)
 tiles = Tiles(TILES_RECT_POS, TILES_RECT_SIZE)
 
 game = Game(screen, tiles, tiles_rect, 0.5)
 game.over = True
-menu = MainMenu(game)
 
-menu.display_menu()
+def main_loop():
+    while (not game.over):
 
-game.start()
+        screen.fill(BACKGROUND_COLOR)
+        pygame.draw.rect(screen, Color(20, 20, 20), tiles_rect)
 
-while (not game.over):
+        game.update_tiles_state()
+        # draw tiles
+        game.draw_tiles()
 
-    screen.fill(BACKGROUND_COLOR)
-    pygame.draw.rect(screen, Color(20, 20, 20), tiles_rect)
+        game.input.check_input()
+        if(game.input.back):
+            game.pause()
+        # move
+        # ----------------------------
+        # self play...
+        # if(len(game.targets) == 0):
+        #     dir = r.randint(0, 3)
 
-    game.update_tiles_state()
-    # draw tiles
+        #     if dir ==  0:
+        #         game.input.down = True
+        #     elif dir == 1:
+        #         game.input.up = True
+        #     elif dir == 2:
+        #         game.input.left = True
+        #     else: 
+        #         game.input.right = True
+        #     game.move()
+        # ----------------------------
+        if(game.input.any_key_pressed):
+            game.move()
+        elif(game.input.quit):
+            pygame.quit()
+            exit()
+        game.input.reset()
+
+        pygame.display.update()
+        clock.tick(60)
+
+    # Game Over
     game.draw_tiles()
-
-    # move
-    game.input.check_input()
-
-    # ----------------------------
-    # self play...
-    # if(len(game.targets) == 0):
-    #     dir = r.randint(0, 3)
-
-    #     if dir ==  0:
-    #         game.input.down = True
-    #     elif dir == 1:
-    #         game.input.up = True
-    #     elif dir == 2:
-    #         game.input.left = True
-    #     else: 
-    #         game.input.right = True
-    #     game.move()
-    # ----------------------------
-    if(game.input.any_key_pressed):
-        game.move()
-    elif(game.input.quit):
-        pygame.quit()
-        exit()
-    game.input.reset()
-
     pygame.display.update()
-    clock.tick(60)
+    pygame.time.wait(2000)
+    Option.input.reset_last_checked()
+    main_menu.display_menu()
 
-# Game Over
-game.draw_tiles()
-pygame.display.update()
-pygame.time.wait(2000)
-menu.display_menu()
+
+main_menu = create_my_menu(screen, game, TITLE_POS, main_loop)
+main_menu.display_menu()
 pygame.quit()
 exit()

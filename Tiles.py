@@ -14,24 +14,26 @@ clock = pygame.time.Clock()
 
 
 class Tiles:
-    def __init__(self, tiles_rect_pos, tiles_rect_size):
-        self.tile_size = tiles_rect_size//4
+    def __init__(self, tiles_rect_pos, tiles_rect_size, size=4):
+        self.tile_size = tiles_rect_size//size
         self.x = tiles_rect_pos[0]
         self.y = tiles_rect_pos[1]
         self.rect_size = tiles_rect_size
 
         self._open_tiles = {}
+        self.reset_tiles()
+        self._update_open_tiles()
+
+    def reset_tiles(self):
         self._tiles = [
             [
                 Tile(*self.get_initial_position(i, j),
                      self.tile_size, TILE_MARGIN, 0)
-                for j in range(tiles_rect_size//self.tile_size)
+                for j in range(self.rect_size//self.tile_size)
             ]
-            for i in range(tiles_rect_size//self.tile_size)
+            for i in range(self.rect_size//self.tile_size)
         ]
-        self.__update_open_tiles()
-
-    def __update_open_tiles(self):
+    def _update_open_tiles(self):
         for row in self._tiles:
             for tile in row:
                 if(tile.num == 0):
@@ -52,6 +54,10 @@ class Tiles:
         chosen_tile = random.choice(list(self._open_tiles.items()))
         self._open_tiles.pop(chosen_tile[0])
         chosen_tile[1].num = random.choices([2, 4], [.8, .2])[0]
+    
+    def reset(self):
+        self.reset_tiles()
+        self._open_tiles.clear()
 
     # def up(self, targets:dict[Tuple[int,int], Tile]):
     #     changed = False
@@ -69,7 +75,7 @@ class Tiles:
     #                 targets[k, j] = tile
     #             changed |= tile.num != startig_value
 
-    #     self.__update_open_tiles
+    #     self._update_open_tiles
     #     return changed
 
     def down(self, targets: dict[Tuple[int, int], Tile]):
@@ -119,7 +125,7 @@ class Tiles:
                 i -= 1
                 tile = self._tiles[i][j]
 
-        self.__update_open_tiles()
+        self._update_open_tiles()
         return changed
 
     def up(self, targets: dict[Tuple[int, int], Tile]):
@@ -169,7 +175,7 @@ class Tiles:
                 i += 1
                 tile = self._tiles[i][j]
 
-        self.__update_open_tiles()
+        self._update_open_tiles()
         return changed
 
     def left(self, targets: dict[Tuple[int, int], Tile]):
@@ -219,7 +225,7 @@ class Tiles:
                 j += 1
                 tile = self._tiles[i][j]
 
-        self.__update_open_tiles()
+        self._update_open_tiles()
         return changed
 
     def right(self, targets: dict[Tuple[int, int], Tile]):
@@ -270,7 +276,7 @@ class Tiles:
                 j -= 1
                 tile = self._tiles[i][j]
 
-        self.__update_open_tiles()
+        self._update_open_tiles()
         return changed
 
     def game_over_check(self):

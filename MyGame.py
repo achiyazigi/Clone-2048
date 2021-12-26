@@ -5,6 +5,7 @@ from pygame.locals import *
 from Inputs import Input
 from Tile import Tile
 from Tiles import Tiles
+from pygame_menu_pro import *
 
 
 pygame.font.init()
@@ -33,10 +34,44 @@ class Game:
         self.over = False
         self.targets: dict[Tuple[int, int], Tile] = {}
         self.animation_speed = animation_speed
+        self.pause_menu = self.create_menu()
+
+    def create_menu(self):
+        def return_to_game(menu:Menu):
+            Option.input.reset()
+            menu.run_display = False
+        
+        back = Option('Keep Playing', 'small_option_font').add.select_listener(return_to_game)
+        restart = Option('Restart', 'small_option_font').add.select_listener(lambda _:self.restart())
+        exit = Option('To Main Menu', 'small_option_font')
+        menu = Option('Pause Menu').add.menu(self.screen, self.screen.get_rect().center, 'small_title_font', background_color=Color(0,0,0,100))\
+            .set_options([
+                back,
+                restart,
+                exit
+            ])
+        return menu
+    
+    def pause(self):
+        self.pause_menu.display_menu()
 
     def start(self):
         self.tiles.generate2or4()
 
+    def set_tiles(self, tiles:Tiles):
+        self.tiles = tiles
+        self.reset()
+
+    def reset(self):
+        self.over = False
+        self.targets.clear()
+        self.changed = False
+        self.start()
+
+    def restart(self):
+        self.tiles.reset()
+        self.reset()
+        
     def draw_tiles(self):
 
         # draw tiles
