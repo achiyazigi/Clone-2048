@@ -74,7 +74,7 @@ loss = tf.pow(Q4actions - Q_n, 2)
 update = tf.train.AdamOptimizer(1e-5).minimize(loss)
 
 sess = tf.Session()
-# sess.run(tf.global_variables_initializer())
+#sess.run(tf.global_variables_initializer())
 new_saver = tf.compat.v1.train.Saver()
 new_saver.restore(sess, tf.train.latest_checkpoint('./RL_output/'))
 
@@ -97,7 +97,6 @@ for i in range(1, 10_001):
     done = False
     num_of_turns = 0
     while not done:
-        num_of_turns += 1
         if SHOW:
             screen.fill(BACKGROUND_COLOR)
             pygame.draw.rect(screen, Color(20, 20, 20), tiles_rect)
@@ -108,7 +107,7 @@ for i in range(1, 10_001):
         all_Qs = sess.run(Q4actions, feed_dict={
                           state: reshape(s)})
 
-        if random.random() < epsilon:
+        if random.random() < epsilon or num_of_turns >= 10:
             next_action = random.randint(0, 3)
         else:
             next_action = np.argmax(all_Qs)
@@ -139,6 +138,9 @@ for i in range(1, 10_001):
 
         elif not game.changed:
             r -= 100
+            num_of_turns += 1
+        else:
+            num_of_turns = 0
 
         Q_corrected = np.copy(all_Qs)
         next_Q = sess.run(Q4actions, feed_dict={
