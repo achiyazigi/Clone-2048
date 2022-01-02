@@ -46,17 +46,17 @@ Z_conv = tf.nn.conv2d(state, W_conv, strides= [1, 1, 1, 1], padding= "SAME") + B
 A_conv = tf.nn.silu(Z_conv)
 A_conv_flat = tf.reshape(A_conv, [1, -1])
 W1 = tf.Variable(tf.truncated_normal(
-    shape = [A_conv_flat.shape[1], 4_00], stddev=1e-5))
-b1 = tf.Variable(tf.constant(0.0, shape=[4_00]))
+    shape = [A_conv_flat.shape[1], 400], stddev=1e-5))
+b1 = tf.Variable(tf.constant(0.0, shape=[400]))
 z1 = tf.matmul(A_conv_flat, W1) + b1
 a1 = tf.nn.silu(z1)
 W2 = tf.Variable(tf.truncated_normal(
-    shape = [4_00, 1_00], stddev=1e-5))
-b2 = tf.Variable(tf.constant(0.0, shape=[1_00]))
+    shape = [400, 100], stddev=1e-5))
+b2 = tf.Variable(tf.constant(0.0, shape=[100]))
 z2 = tf.matmul(a1, W2) + b2
 a2 = tf.nn.silu(z2)
 W3 = tf.Variable(tf.truncated_normal(
-    shape = [1_00, 50], stddev=1e-5))
+    shape = [100, 50], stddev=1e-5))
 b3 = tf.Variable(tf.constant(0.0, shape=[50]))
 z3 = tf.matmul(a2, W3) + b3
 a3 = tf.nn.silu(z3)
@@ -74,9 +74,9 @@ loss = tf.pow(Q4actions - Q_n, 2)
 update = tf.train.AdamOptimizer(1e-5).minimize(loss)
 
 sess = tf.Session()
-sess.run(tf.global_variables_initializer())
-# new_saver = tf.compat.v1.train.Saver()
-# new_saver.restore(sess, tf.train.latest_checkpoint('./RL_output/'))
+# sess.run(tf.global_variables_initializer())
+new_saver = tf.compat.v1.train.Saver()
+new_saver.restore(sess, tf.train.latest_checkpoint('./RL_output/'))
 
 r = 0
 for i in range(1, 10_001):
@@ -95,7 +95,9 @@ for i in range(1, 10_001):
     s = [[math.log2(tile.num) if tile.num > 0 else 0 for tile in row]
          for row in tiles._tiles]  # first move doesn't matter anyway, just get the state
     done = False
+    num_of_turns = 0
     while not done:
+        num_of_turns += 1
         if SHOW:
             screen.fill(BACKGROUND_COLOR)
             pygame.draw.rect(screen, Color(20, 20, 20), tiles_rect)
@@ -129,7 +131,7 @@ for i in range(1, 10_001):
         if game.over:
             points = max(
                 [max(row, key=lambda t: t.num).num for row in tiles._tiles])
-            r += (points**2)
+            r += points**2
             print('last points:', points)
             mavg = d_factor*mavg + (1-d_factor)*points
             print("mavg : " , mavg)
