@@ -8,11 +8,18 @@ class Plot:
         self.y_vals = []
         self.indx = count()
 
-    def plot(self,mavg):
-        self.x_vals.append(next(self.indx))
-        self.y_vals.append(mavg)
+    def clear(self):
         plt.cla()
-        plt.plot(self.x_vals , self.y_vals)
+
+    def plot(self, val, label):
+        self.x_vals.append(next(self.indx))
+        self.y_vals.append(val)
+        plt.plot(self.x_vals , self.y_vals , label= label)
         plt.tight_layout()
+
+
+    def draw(self):
+        plt.legend(loc='upper left')
         plt.draw()
-        plt.pause(0.1)
+        plt.pause(1e-10)
+
